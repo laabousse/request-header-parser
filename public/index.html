@@ -1,81 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Header Parser Microservice</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Parser API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-      body {
-        padding: 20px;
-        background-color: #f8f9fa;
-      }
-      .container {
-        max-width: 800px;
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      .output {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 5px;
-        margin-top: 20px;
-      }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ef 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 800px;
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            font-size: 2.25rem;
+        }
+
+        .lead {
+            color: #4a5568;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        .api-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .api-url {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4a5568;
+            border: none;
+            color: #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-button:hover {
+            background: #718096;
+        }
+
+        .output {
+            background: #1a202c;
+            color: #a0aec0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        .test-button {
+            background: #4c51bf;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .test-button:hover {
+            background: #434190;
+            transform: translateY(-1px);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease-out;
+        }
+
+        .result-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .key {
+            color: #63b3ed;
+        }
+
+        .string {
+            color: #68d391;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .api-url {
+                font-size: 0.75rem;
+                padding: 0.75rem 1rem;
+                overflow-x: auto;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <h1>Request Header Parser Microservice</h1>
-      <p class="lead">
-        This microservice returns information about your browser and system.
-      </p>
+        <h1>Request Header Parser</h1>
+        <p class="lead">
+            A simple microservice that returns your browser information, IP address, and language preferences.
+        </p>
 
-      <div class="mb-4">
-        <h2>Example Usage:</h2>
-        <code>[project_url]/api/whoami</code>
-      </div>
+        <div class="api-section">
+            <h2 class="h5 mb-3">API Endpoint</h2>
+            <div class="api-url">
+                GET /api/whoami
+                <button class="copy-button" onclick="copyEndpoint()">Copy</button>
+            </div>
+        </div>
 
-      <div class="mb-4">
-        <h2>Example Output:</h2>
-        <pre class="output">
-{
-    "ipaddress": "159.20.14.100",
-    "language": "en-US,en;q=0.5",
-    "software": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36..."
-}</pre
-        >
-      </div>
+        <div class="api-section">
+            <h2 class="h5 mb-3">Example Response</h2>
+            <pre class="output">{
+    <span class="key">"ipaddress"</span>: <span class="string">"159.20.14.100"</span>,
+    <span class="key">"language"</span>: <span class="string">"en-US,en;q=0.5"</span>,
+    <span class="key">"software"</span>: <span class="string">"Mozilla/5.0 (X11; Linux x86_64) ..."</span>
+}</pre>
+        </div>
 
-      <button class="btn btn-primary" onclick="testAPI()">Test API</button>
-      <div id="result" class="output" style="display: none">
-        <h3>Your Results:</h3>
-        <pre id="resultText"></pre>
-      </div>
+        <button class="test-button" onclick="testAPI()">
+            Test the API
+            <div class="loading" style="display: none;"></div>
+        </button>
+
+        <div id="result" class="result-section">
+            <h2 class="h5 mb-3">Your Results</h2>
+            <pre id="resultText" class="output"></pre>
+        </div>
     </div>
 
     <script>
-      async function testAPI() {
-        try {
-          const response = await fetch("/api/whoami");
-          const data = await response.json();
-          document.getElementById("resultText").textContent = JSON.stringify(
-            data,
-            null,
-            2
-          );
-          document.getElementById("result").style.display = "block";
-        } catch (error) {
-          console.error("Error:", error);
-          document.getElementById("resultText").textContent =
-            "Error fetching data";
-          document.getElementById("result").style.display = "block";
+        async function testAPI() {
+            const button = document.querySelector('.test-button');
+            const loader = document.querySelector('.loading');
+            const resultSection = document.getElementById('result');
+            
+            // Show loading state
+            button.disabled = true;
+            loader.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/api/whoami');
+                const data = await response.json();
+                
+                // Format the JSON with syntax highlighting
+                const formattedJson = JSON.stringify(data, null, 4)
+                    .replace(/"(\w+)":/g, '<span class="key">"$1"</span>:')
+                    .replace(/: "([^"]+)"/g, ': <span class="string">"$1"</span>');
+                
+                document.getElementById('resultText').innerHTML = formattedJson;
+                resultSection.classList.add('visible');
+            } catch (error) {
+                document.getElementById('resultText').innerHTML = 'Error fetching data';
+                resultSection.classList.add('visible');
+            } finally {
+                // Hide loading state
+                button.disabled = false;
+                loader.style.display = 'none';
+            }
         }
-      }
+
+        function copyEndpoint() {
+            const endpoint = `${window.location.origin}/api/whoami`;
+            navigator.clipboard.writeText(endpoint);
+            
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
     </script>
-  </body>
+</body>
 </html>
